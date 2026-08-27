@@ -2,7 +2,7 @@
 
 **Dupla:** Cayke Veras e Filipe Coelho
 
-## 📋 Descrição
+## Descrição
 
 Este projeto implementa e compara dois métodos fundamentais de interpolação de imagens:
 - **Vizinho Mais Próximo (VMP)**: Método rápido que copia o valor do pixel vizinho mais próximo
@@ -10,7 +10,7 @@ Este projeto implementa e compara dois métodos fundamentais de interpolação d
 
 O projeto demonstra como estes métodos funcionam tanto para **ampliação** (upscaling) quanto para **redução** (downscaling) de imagens.
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 amostragem/
@@ -24,7 +24,7 @@ amostragem/
 └── README.md                 # Este arquivo
 ```
 
-## 🚀 Como Executar
+## Como Executar
 
 ### Gerar as imagens processadas:
 ```bash
@@ -43,7 +43,7 @@ Abra o arquivo `transformacoes.html` em um navegador web para ver uma apresenta�
 - Tabela comparativa
 - Imagens processadas com descrições
 
-## 🎯 Conceitos Principais
+## Conceitos Principais
 
 ### Vizinho Mais Próximo
 - **Velocidade:** Muito rápida
@@ -57,7 +57,7 @@ Abra o arquivo `transformacoes.html` em um navegador web para ver uma apresenta�
 - **Melhor para:** Ampliação e redução com qualidade visual
 - **Algoritmo:** Interpola os 4 vizinhos mais próximos usando pesos proporcionais às distâncias fracionárias
 
-## 📊 Resultados Comparativos
+## Resultados Comparativos
 
 | Critério | Vizinho Mais Próximo | Interpolação Bilinear |
 |----------|---------------------|----------------------|
@@ -68,7 +68,7 @@ Abra o arquivo `transformacoes.html` em um navegador web para ver uma apresenta�
 | Preservação de Cores | Exata | Aproximada |
 
 
-## 👥 Autores
+## Autores
 
 - **Cayke Veras**
 - **Filipe Coelho**
@@ -77,7 +77,7 @@ Abra o arquivo `transformacoes.html` em um navegador web para ver uma apresenta�
 **Instituição:** UFT (Universidade Federal do Tocantins)  
 **Professor:** Dra. Glenda Botelho
 
-## 📝 Notas Técnicas
+## Notas Técnicas
 
 - A imagem de teste é uma matriz 8×8 pixels com gradiente de cinza (valores de 0 a 255)
 - Ampliação realizada de 8×8 para 16×16 pixels
