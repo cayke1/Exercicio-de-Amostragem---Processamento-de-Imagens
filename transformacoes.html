@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformações de Imagem - Interpolação</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f2f2f2;
+            color: #1a1a1a;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        .section {
+            margin-bottom: 50px;
+        }
+
+        .section-title {
+            background: white;
+            padding: 18px 40px;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #1a1a1a;
+            letter-spacing: -0.3px;
+        }
+
+        .section-content {
+            background: white;
+            padding: 40px;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .original-section .section-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .image-container {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 2px solid #d0d0d0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+
+        .image-container img {
+            width: 400px;
+            height: auto;
+            image-rendering: pixelated;
+            image-rendering: crisp-edges;
+            border: 2px solid #999;
+            display: block;
+            background: white;
+            image-rendering: -webkit-optimize-contrast;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        @media (max-width: 1000px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-item {
+            text-align: center;
+            padding: 20px;
+            background: #fafafa;
+            border-radius: 8px;
+        }
+
+        .comparison-item h3 {
+            color: #1a1a1a;
+            margin-bottom: 20px;
+            font-size: 1.15em;
+            font-weight: 600;
+        }
+
+        .comparison-item .image-container {
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .comparison-item p {
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .method-description {
+            background: #f8f8f8;
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            color: #333;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+
+        .method-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+        }
+
+        .original-section .method-description {
+            max-width: 600px;
+            margin: 20px auto;
+        }
+
+        .info-box {
+            background: #f8f8f8;
+            border: 1px solid #e0e0e0;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 20px;
+            color: #555;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+            font-size: 0.85em;
+        }
+
+        .pros {
+            background: #f0faf0;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #2d8a4e;
+        }
+
+        .cons {
+            background: #fdf0f0;
+            padding: 12px;
+            border-radius: 4px;
+            border-left: 3px solid #c0392b;
+        }
+
+        .pros strong, .cons strong {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.95em;
+            color: #1a1a1a;
+        }
+
+        .pros-cons ul {
+            margin-left: 18px;
+            color: #333;
+        }
+
+        .pros-cons li {
+            margin-bottom: 4px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        table th {
+            background: #f8f8f8;
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #e0e0e0;
+            color: #1a1a1a;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8em;
+            letter-spacing: 0.3px;
+        }
+
+        table th:not(:first-child) {
+            text-align: center;
+        }
+
+        table td {
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        table td:not(:first-child) {
+            text-align: center;
+        }
+
+        table tbody tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        footer {
+            text-align: center;
+            color: #888;
+            margin-top: 50px;
+            font-size: 0.9em;
+        }
+
+        footer p {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Transformações de Imagem</h1>
+            <p>Interpolação: Vizinho Mais Próximo vs Interpolação Bilinear</p>
+        </header>
+
+        <!-- Seção Original -->
+        <div class="section original-section">
+            <div class="section-title">Imagem Original</div>
+            <div class="section-content">
+                <div class="image-container">
+                    <img src="original.png" alt="Imagem Original 8x8">
+                </div>
+                <p style="margin-top: 20px; color: #666; font-size: 0.95em;">Imagem de teste 8×8 com gradiente de cinza (0-255)</p>
+                <div class="method-description" style="margin-top: 30px;">
+                    <div class="method-title">Sobre as Transformações</div>
+                    <p>A imagem original de 8×8 pixels será ampliada para 16×16 e reduzida para 4×4 usando dois métodos diferentes de interpolação. Cada método tem características únicas que afetam a qualidade e a aparência do resultado.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Ampliação -->
+        <div class="section">
+            <div class="section-title">Ampliação (8×8 → 16×16)</div>
+            <div class="section-content">
+                <div class="comparison-grid">
+                    <!-- Vizinho Mais Próximo - Ampliação -->
+                    <div class="comparison-item">
+                        <h3>Vizinho Mais Próximo</h3>
+                        <div class="image-container">
+                            <img src="vmp_ampliacao.png" alt="Vizinho Mais Próximo - Ampliação">
+                        </div>
+                        <p>Resultado mais "pixelado", com blocos de cores bem definidos.</p>
+
+                        <div class="method-description">
+                            <div class="method-title">Como funciona</div>
+                            <p>Cada pixel novo é atribuído o valor do vizinho mais próximo na imagem original. É o método mais rápido, mas menos suave.</p>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <strong>✓ Vantagens</strong>
+                                <ul>
+                                    <li>Muito rápido</li>
+                                    <li>Simples</li>
+                                    <li>Preserve cores exatas</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <strong>✗ Desvantagens</strong>
+                                <ul>
+                                    <li>Muito pixelado</li>
+                                    <li>Artefatos visíveis</li>
+                                    <li>Baixa qualidade</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bilinear - Ampliação -->
+                    <div class="comparison-item">
+                        <h3>Interpolação Bilinear</h3>
+                        <div class="image-container">
+                            <img src="bilinear_ampliacao.png" alt="Bilinear - Ampliação">
+                        </div>
+                        <p>Resultado mais suave, com transições graduais entre pixels.</p>
+
+                        <div class="method-description">
+                            <div class="method-title">Como funciona</div>
+                            <p>Interpola os 4 vizinhos mais próximos com pesos baseados na distância. Produz transições mais suaves entre os valores de pixel.</p>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <strong>✓ Vantagens</strong>
+                                <ul>
+                                    <li>Resultado mais suave</li>
+                                    <li>Menos artefatos</li>
+                                    <li>Melhor qualidade</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <strong>✗ Desvantagens</strong>
+                                <ul>
+                                    <li>Mais lento</li>
+                                    <li>Pode criar valores intermediários</li>
+                                    <li>Perda de nitidez</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Nota:</strong> Para ampliação (upscaling), a interpolação bilinear geralmente produz melhores resultados visualmente, embora custe mais em termos de processamento.
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Redução -->
+        <div class="section">
+            <div class="section-title">Redução (8×8 → 4×4)</div>
+            <div class="section-content">
+                <div class="comparison-grid">
+                    <!-- Vizinho Mais Próximo - Redução -->
+                    <div class="comparison-item">
+                        <h3>Vizinho Mais Próximo</h3>
+                        <div class="image-container">
+                            <img src="vmp_reducao.png" alt="Vizinho Mais Próximo - Redução">
+                        </div>
+                        <p>Redução simples, pode perder detalhes importantes.</p>
+
+                        <div class="method-description">
+                            <div class="method-title">Como funciona</div>
+                            <p>Mapeia cada pixel reduzido para o vizinho mais próximo. Rápido, mas pode causar perda significativa de informação.</p>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <strong>✓ Vantagens</strong>
+                                <ul>
+                                    <li>Muito rápido</li>
+                                    <li>Preserve cores originais</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <strong>✗ Desvantagens</strong>
+                                <ul>
+                                    <li>Perda de informação</li>
+                                    <li>Aliasing</li>
+                                    <li>Artefatos</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bilinear - Redução -->
+                    <div class="comparison-item">
+                        <h3>Interpolação Bilinear</h3>
+                        <div class="image-container">
+                            <img src="bilinear_reducao.png" alt="Bilinear - Redução">
+                        </div>
+                        <p>Redução mais suave com melhor distribuição de valores.</p>
+
+                        <div class="method-description">
+                            <div class="method-title">Como funciona</div>
+                            <p>Média ponderada dos 4 vizinhos próximos. Preserva melhor a informação durante a redução.</p>
+                        </div>
+
+                        <div class="pros-cons">
+                            <div class="pros">
+                                <strong>✓ Vantagens</strong>
+                                <ul>
+                                    <li>Melhor preservação</li>
+                                    <li>Menos aliasing</li>
+                                    <li>Distribuição mais suave</li>
+                                </ul>
+                            </div>
+                            <div class="cons">
+                                <strong>✗ Desvantagens</strong>
+                                <ul>
+                                    <li>Mais processamento</li>
+                                    <li>Valores intermediários</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>Nota:</strong> Para redução (downscaling), filtros mais sofisticados como Lanczos ou Gaussian produzem ainda melhores resultados, mas a interpolação bilinear é um bom compromisso entre velocidade e qualidade.
+                </div>
+            </div>
+        </div>
+
+        <!-- Seção Resumo -->
+        <div class="section">
+            <div class="section-title">Resumo Comparativo</div>
+            <div class="section-content">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Critério</th>
+                            <th>Vizinho Mais Próximo</th>
+                            <th>Interpolação Bilinear</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Velocidade</strong></td>
+                            <td>Muito Rápida</td>
+                            <td>Moderada</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Qualidade Visual</strong></td>
+                            <td>Baixa</td>
+                            <td>Boa</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Uso em Ampliação</strong></td>
+                            <td>Ruim</td>
+                            <td>Bom</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Uso em Redução</strong></td>
+                            <td>Aceitável</td>
+                            <td>Melhor</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Preservação de Cores</strong></td>
+                            <td>Exata</td>
+                            <td>Aproximada</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="method-description">
+                    <div class="method-title">Recomendações</div>
+                    <ul style="margin-left: 20px; line-height: 1.8;">
+                        <li><strong>Usar Vizinho Mais Próximo quando:</strong> velocidade é crítica, a imagem é pequena, ou você quer um efeito "pixel art".</li>
+                        <li><strong>Usar Interpolação Bilinear quando:</strong> qualidade é importante, você está ampliando imagens, ou precisa de transições suaves.</li>
+                        <li><strong>Para resultado profissional:</strong> considere filtros avançados como Lanczos, Bicúbica ou Gaussian Blur antes da redução.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Processamento de Imagens - Aula 3 | Prof. Dra. Glenda Botelho - UFT</p>
+            <p>Implementação de Interpolação de Imagens</p>
+        </footer>
+    </div>
+</body>
+</html>
